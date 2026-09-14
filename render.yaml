@@ -15,7 +15,7 @@ services:
         generateValue: true
       - key: DB_CONNECTION
         value: pgsql
-      - key: DATABASE_URL
+      - key: DB_URL
         fromDatabase:
           name: auth-db
           property: connectionString
