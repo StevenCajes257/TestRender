@@ -6,7 +6,6 @@ services:
     plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    preDeployCommand: php artisan migrate --force
     envVars:
       - key: APP_ENV
         value: production
