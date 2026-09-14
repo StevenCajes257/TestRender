@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: auth_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: auth_system
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - auth_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auth_backend
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - APP_NAME=Laravel
+      - APP_ENV=production
+      - APP_KEY=base64:Xv9Z8K3L2mN1pQ4rS5tU6vW7xY8zA9bC0dE1fG2hI3j=
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=auth_system
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - SESSION_DRIVER=database
+    ports:
+      - "8000:80"
+    networks:
+      - auth_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: auth_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    networks:
+      - auth_network
+
+volumes:
+  mysql_data:
+
+networks:
+  auth_network:
+    driver: bridge

@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: auth-messenger-backend
+    env: php
+    region: oregon
+    plan: free
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php artisan config:cache && php artisan route:cache && php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auth-db
+          property: connectionString
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+
+  - type: web
+    name: auth-messenger-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: "frontend/dist"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: auth-messenger-backend
+          property: host
+          transform: "https://{host}/api"
+
+databases:
+  - name: auth-db
+    databaseName: auth_system
+    user: auth_user
+    plan: free
+    region: oregon
