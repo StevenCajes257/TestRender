@@ -18,7 +18,7 @@ services:
         value: https://auth-messenger-backend.onrender.com
 
       - key: APP_KEY
-        generateValue: true
+        sync: false
 
       - key: LOG_CHANNEL
         value: stderr
