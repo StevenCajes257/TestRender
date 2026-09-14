@@ -1,16 +1,17 @@
 services:
   - type: web
     name: auth-messenger-backend
-    env: php
+    runtime: docker
     region: oregon
     plan: free
-    buildCommand: "composer install --no-dev --optimize-autoloader"
-    startCommand: "php artisan config:cache && php artisan route:cache && php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    preDeployCommand: php artisan migrate --force
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: "false"
       - key: APP_KEY
         generateValue: true
       - key: DB_CONNECTION
@@ -26,9 +27,7 @@ services:
 
   - type: web
     name: auth-messenger-frontend
-    env: static
-    region: oregon
-    plan: free
+    runtime: static
     buildCommand: "cd frontend && npm install && npm run build"
     staticPublishPath: "frontend/dist"
     routes:
